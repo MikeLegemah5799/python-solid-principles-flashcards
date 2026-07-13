@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOLID Principles — Python 3 Flash Cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f4f0e7; --paper-2:#efe9dc;
+    --ink:#161514; --rule:#111;
+    --teal:#1f97ae; --teal-soft:#5bc0d0;
+    --coral:#e0514c; --muted:#726c60; --line:#d8d0be;
+    --code-bg:#191f26; --code-fg:#e7e3d8;
+    --code-com:#8aa889; --code-str:#e2b871; --code-kw:#5cc4da; --code-fn:#f0938c; --code-num:#c69cf0;
+    --disp:"Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+    --mono:"JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--paper);background-image:linear-gradient(var(--line) 1px, transparent 1px);background-size:100% 34px;color:var(--ink);font-family:var(--mono);min-height:100vh;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:840px;margin:0 auto;padding:26px 18px 60px;}
+
+  .kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);font-weight:700;}
+  h1{font-family:var(--disp);font-weight:700;font-size:clamp(28px,6.4vw,48px);line-height:.96;letter-spacing:-.01em;margin:4px 0 8px;}
+  .sub{font-size:13px;color:var(--muted);line-height:1.55;max-width:64ch;}
+  .rule{height:6px;background:var(--rule);border-radius:2px;margin:12px 0 14px;}
+
+  .legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:11.5px;color:var(--muted);margin:0 0 16px;align-items:center;}
+  .legend b{color:var(--ink);}
+  .dot{display:inline-flex;align-items:center;gap:6px;}
+  .pip{width:11px;height:11px;border-radius:50%;display:inline-block;border:2px solid;}
+  .pip.core{background:var(--coral);border-color:var(--coral);}
+  .pip.common{background:transparent;border-color:var(--teal);}
+  .pip.sit{background:transparent;border-color:var(--muted);}
+
+  .filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;}
+  .chip{font-size:11.5px;font-weight:600;letter-spacing:.02em;padding:6px 11px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);border-radius:20px;cursor:pointer;transition:.12s;}
+  .chip:hover{background:var(--paper-2);}
+  .chip.active{background:var(--ink);color:var(--paper);}
+
+  .stage{perspective:1600px;margin-bottom:16px;}
+  .card{position:relative;width:100%;min-height:480px;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.7,.2,1);cursor:pointer;}
+  .card.flipped{transform:rotateY(180deg);}
+  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#fbf8f1;border:2.5px solid var(--ink);border-radius:14px;box-shadow:7px 8px 0 rgba(17,17,17,.9);padding:24px 24px 20px;display:flex;flex-direction:column;overflow:hidden;}
+  .toprow{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+  .eyebrow{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;font-weight:700;color:var(--teal);}
+  .tier{font-family:var(--disp);font-weight:700;font-size:10px;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:20px;white-space:nowrap;}
+  .tier.core{background:var(--coral);color:#fff;}
+  .tier.common{background:transparent;color:var(--teal);border:1.5px solid var(--teal);}
+  .tier.sit{background:transparent;color:var(--muted);border:1.5px solid var(--muted);}
+
+  .front{align-items:stretch;text-align:center;}
+  .front .center{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+  .term{font-family:var(--disp);font-weight:700;letter-spacing:-.015em;line-height:1.02;font-size:clamp(26px,5.6vw,44px);}
+  .underbar{height:5px;width:min(360px,72%);background:var(--rule);border-radius:2px;margin:20px auto 0;}
+  .flip-hint{margin-top:16px;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px;}
+  .flip-hint b{color:var(--coral);font-weight:700;}
+  .arrow{color:var(--coral);font-family:var(--disp);font-weight:700;}
+
+  .back{transform:rotateY(180deg);}
+  .backscroll{overflow-y:auto;flex:1;display:flex;flex-direction:column;padding-right:3px;}
+  .backscroll::-webkit-scrollbar{width:7px;}
+  .backscroll::-webkit-scrollbar-thumb{background:#cfc7b4;border-radius:4px;}
+  .bterm{font-family:var(--disp);font-weight:700;font-size:clamp(18px,4vw,25px);margin:3px 0 8px;line-height:1.04;}
+  .thinrule{height:3px;background:var(--rule);border-radius:2px;margin:0 0 11px;}
+  .def{font-size:12.5px;line-height:1.5;color:#242019;margin:0 0 11px;}
+  .def strong{color:var(--teal);font-weight:700;}
+  .def code{background:var(--paper-2);border-radius:4px;padding:0 4px;font-size:11.5px;}
+  .def .li{display:block;padding-left:14px;position:relative;margin:3px 0;}
+  .def .li:before{content:"\203A";position:absolute;left:0;color:var(--coral);font-weight:700;}
+
+  .trigger{border-left:4px solid var(--coral);background:#fbeeec;border-radius:0 8px 8px 0;padding:9px 12px;margin:0 0 12px;}
+  .trigger .tlabel{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);font-weight:700;display:block;margin-bottom:3px;}
+  .trigger .ttext{font-size:12px;line-height:1.45;color:#3a2320;}
+  .trigger .ttext code{background:#f3ddd9;border-radius:4px;padding:0 4px;}
+
+  pre{margin:0 0 12px;background:var(--code-bg);color:var(--code-fg);border-radius:9px;padding:12px 13px;font-family:var(--mono);font-size:11.5px;line-height:1.5;overflow-x:auto;white-space:pre;border:1px solid #2b333d;}
+  pre::-webkit-scrollbar{height:8px;}
+  pre::-webkit-scrollbar-thumb{background:#39424d;border-radius:4px;}
+  .c-com{color:var(--code-com);font-style:italic;}.c-str{color:var(--code-str);}.c-kw{color:var(--code-kw);}.c-fn{color:var(--code-fn);}.c-num{color:var(--code-num);}
+
+  .prob{margin:0 0 11px;}
+  .prob .plabel{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:5px;}
+  .pills{display:flex;flex-wrap:wrap;gap:6px;}
+  .pill{font-size:10.5px;font-weight:600;padding:4px 9px;border:1.5px solid var(--teal);color:var(--teal);border-radius:20px;background:#eef8fa;}
+
+  .cx{margin-top:auto;padding-top:10px;font-size:11px;color:var(--muted);display:flex;flex-wrap:wrap;gap:6px 16px;letter-spacing:.02em;border-top:1px dashed var(--line);}
+  .cx b{color:var(--ink);font-weight:700;}
+
+  .controls{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px;}
+  .navbtn{font-family:var(--disp);font-weight:700;font-size:14px;padding:11px 16px;border:2.5px solid var(--ink);background:#fbf8f1;color:var(--ink);border-radius:11px;cursor:pointer;transition:.1s;box-shadow:3px 4px 0 rgba(17,17,17,.85);}
+  .navbtn:hover{transform:translate(-1px,-1px);box-shadow:4px 5px 0 rgba(17,17,17,.85);}
+  .navbtn:active{transform:translate(2px,3px);box-shadow:1px 1px 0 rgba(17,17,17,.85);}
+  .flipbtn{background:var(--coral);color:#fff;}
+  .counter{font-family:var(--disp);font-weight:700;font-size:15px;text-align:center;min-width:70px;}
+  .counter small{display:block;font-family:var(--mono);font-weight:500;font-size:9.5px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-top:2px;line-height:1.3;}
+  .util{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;}
+  .util .navbtn{font-size:12px;padding:8px 13px;box-shadow:2px 3px 0 rgba(17,17,17,.85);}
+  .foot{margin-top:26px;font-size:11px;color:var(--muted);text-align:center;line-height:1.7;}
+  .kbd{font-family:var(--mono);border:1px solid var(--muted);border-radius:5px;padding:1px 6px;font-size:10.5px;}
+  @media (max-width:520px){.face{padding:18px 16px;}.navbtn{padding:10px 12px;}body{background-size:100% 30px;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Python 3 · low-level design &amp; code review · diagnose, don't recite</div>
+    <h1>SOLID Principles — Interview Deck</h1>
+    <p class="sub">The five principles plus everything they pull in, organized for a design/code-review loop. Each card leads with the <strong>code smell that signals a violation</strong>, then a before → after refactor in Python. Study 1→5; the five principles are the part to know cold.</p>
+    <div class="rule"></div>
+    <div class="legend">
+      <span class="dot"><span class="pip core"></span><b>Core</b> — know cold</span>
+      <span class="dot"><span class="pip common"></span><b>Common</b> — know well</span>
+      <span class="dot"><span class="pip sit"></span><b>Situational</b> — recognize &amp; recall</span>
+    </div>
+  </header>
+
+  <div class="filters" id="filters"></div>
+
+  <div class="stage">
+    <div class="card" id="card" onclick="flip()">
+      <div class="face front">
+        <div class="toprow"><span class="eyebrow" id="f-track"></span><span class="tier" id="f-tier"></span></div>
+        <div class="center">
+          <div class="term" id="f-term"></div>
+          <div class="underbar"></div>
+          <div class="flip-hint"><span class="arrow">↻</span> flip for the smell, the fix &amp; the pattern</div>
+        </div>
+      </div>
+      <div class="face back">
+        <div class="backscroll">
+          <div class="toprow"><span class="eyebrow" id="b-track"></span><span class="tier" id="b-tier"></span></div>
+          <div class="bterm" id="b-term"></div>
+          <div class="thinrule"></div>
+          <div class="def" id="b-def"></div>
+          <div class="trigger"><span class="tlabel" id="b-tlabel"></span><span class="ttext" id="b-trigger"></span></div>
+          <pre id="b-code"></pre>
+          <div class="prob" id="b-prob-wrap"><div class="plabel" id="b-mapslabel"></div><div class="pills" id="b-prob"></div></div>
+          <div class="cx" id="b-cx"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="navbtn" onclick="prev(event)">‹ Prev</button>
+    <div class="counter"><span id="pos">1</span> / <span id="total">1</span><small id="deckname">All</small></div>
+    <button class="navbtn" onclick="next(event)">Next ›</button>
+  </div>
+  <div class="util">
+    <button class="navbtn flipbtn" onclick="flip(event)">Flip ⟳</button>
+    <button class="navbtn" onclick="shuffle(event)">Shuffle ⤨</button>
+    <button class="navbtn" onclick="coreOnly(event)">Core only &#x2605;</button>
+    <button class="navbtn" onclick="reset(event)">Reset ↺</button>
+  </div>
+
+  <p class="foot">
+    <span class="kbd">←</span> / <span class="kbd">→</span> navigate &nbsp;·&nbsp; <span class="kbd">Space</span> flip &nbsp;·&nbsp; <span class="kbd">S</span> shuffle &nbsp;·&nbsp; <span class="kbd">C</span> core-only<br>
+    19 cards &nbsp;·&nbsp; the five principles + the mechanisms, companions &amp; patterns they lead to
+  </p>
+</div>
+
+<script>
+const CARDS = [
+/* ===== 1 · ORIENTATION ===== */
+{track:"1 · Orientation",tier:"core",term:"SOLID",
+ def:"Five object-oriented design principles (Robert C. Martin) for code that\u2019s easy to change and test. Each one attacks a specific kind of rigidity.",
+ tlabel:"Use it when",
+ trigger:"In a design or code-review interview, use SOLID as a vocabulary to justify a refactor: name the smell, name the principle, show the fix. Diagnose \u2014 don\u2019t recite the acronym.",
+ code:`# S  Single Responsibility   one reason to change
+# O  Open / Closed            extend, don't modify
+# L  Liskov Substitution      subtypes swap cleanly
+# I  Interface Segregation     small, focused roles
+# D  Dependency Inversion     depend on abstractions`,
+ mapsLabel:"Context",maps:["Clean Architecture","Design Patterns","OOD"],
+ cx:["goal: <b>low coupling</b>, <b>high cohesion</b>"]},
+
+{track:"1 · Orientation",tier:"core",term:"Smell \u2192 Principle",
+ def:"The fast diagnostic. Interviewers reward spotting the smell, not quoting the definition \u2014 memorize this reverse index.",
+ tlabel:"Diagnose it when you see",
+ trigger:"A god class \u2192 SRP. An <code>if/elif</code> chain on a type field \u2192 OCP. A subclass that raises <code>NotImplementedError</code> \u2192 LSP. An interface half-stubbed with <code>pass</code> \u2192 ISP. A class that builds its own concrete dependency \u2192 DIP.",
+ code:`# mixed concerns in one class ......... SRP
+# if/elif/switch on a 'type' field .... OCP
+# subclass raises NotImplementedError . LSP
+# implementers stub methods with pass . ISP
+# class news-up its own dependencies .. DIP`,
+ mapsLabel:"",maps:[],
+ cx:["learn the <b>smells</b>, the definitions follow"]},
+
+/* ===== 2 · THE FIVE ===== */
+{track:"2 · The Five (SOLID)",tier:"core",term:"S \u2014 Single Responsibility",
+ def:"A class should have <strong>one reason to change</strong> \u2014 it serves a single actor / responsibility. Mixing concerns means one change risks breaking unrelated behavior.",
+ tlabel:"You\u2019re violating it when",
+ trigger:"A class does validation <em>and</em> persistence <em>and</em> notification; or a <code>...Manager</code> / <code>...Helper</code> that changing the database <em>and</em> changing a report format both touch.",
+ code:`# BEFORE: three reasons to change in one class
+class UserService:
+    def register(self, name, email):
+        if "@" not in email:          # validation
+            raise ValueError("bad email")
+        db.save({"name": name})        # persistence
+        smtp.send(email, "Welcome!")   # notification
+
+# AFTER: one responsibility each
+class UserValidator:  def validate(self, email): ...
+class UserRepository: def save(self, user): ...
+class EmailService:   def send_welcome(self, email): ...`,
+ mapsLabel:"Refactors to",maps:["Extract Class","Facade"],
+ cx:["one class, <b>one actor / reason to change</b>"]},
+
+{track:"2 · The Five (SOLID)",tier:"core",term:"O \u2014 Open / Closed",
+ def:"Software should be <strong>open for extension, closed for modification</strong>. Add new behavior with new code, not by editing code that already works.",
+ tlabel:"You\u2019re violating it when",
+ trigger:"A growing <code>if/elif</code> or <code>match</code> on a \u201ckind\u201d field \u2014 every new variant forces you to re-open and edit the same function (and re-test it).",
+ code:`# BEFORE: a new shape edits this function
+def area(shape):
+    if shape.kind == "circle": return 3.14159 * shape.r**2
+    elif shape.kind == "square": return shape.side**2
+    # ...every new shape reopens this
+
+# AFTER: extend by adding a class
+from abc import ABC, abstractmethod
+class Shape(ABC):
+    @abstractmethod
+    def area(self) -> float: ...
+class Circle(Shape):
+    def __init__(self, r): self.r = r
+    def area(self): return 3.14159 * self.r**2
+# new shape = new subclass, area() code untouched`,
+ mapsLabel:"Realized by",maps:["Strategy","Template Method","Decorator"],
+ cx:["add code, don\u2019t <b>edit</b> working code"]},
+
+{track:"2 · The Five (SOLID)",tier:"core",term:"L \u2014 Liskov Substitution",
+ def:"A subtype must be usable <strong>anywhere its base type is expected</strong>, without surprising callers. Subclasses can\u2019t weaken guarantees or throw where the base doesn\u2019t.",
+ tlabel:"You\u2019re violating it when",
+ trigger:"A subclass overrides a method to <code>raise NotImplementedError</code>, or callers need <code>isinstance</code> checks to special-case a subtype. The classic tell: a Square that breaks Rectangle, or a Penguin that can\u2019t <code>fly()</code>.",
+ code:`# BEFORE: Penguin is not substitutable for a flying Bird
+class Bird:
+    def fly(self): ...
+class Penguin(Bird):
+    def fly(self):
+        raise NotImplementedError    # breaks Bird callers
+
+# AFTER: model the capability, not the taxonomy
+class Bird: ...
+class FlyingBird(Bird):
+    def fly(self): ...
+class Penguin(Bird):                 # simply has no fly()
+    def swim(self): ...`,
+ mapsLabel:"Leans on",maps:["Composition","Design by Contract"],
+ cx:["a subtype must <b>honor the base\u2019s contract</b>"]},
+
+{track:"2 · The Five (SOLID)",tier:"core",term:"I \u2014 Interface Segregation",
+ def:"Clients shouldn\u2019t be forced to depend on methods they don\u2019t use. Prefer <strong>many small role interfaces</strong> over one fat one.",
+ tlabel:"You\u2019re violating it when",
+ trigger:"An interface / ABC where some implementers stub methods with <code>pass</code> or raise, because the contract bundles things they don\u2019t need (a Robot forced to implement <code>eat()</code>).",
+ code:`# BEFORE: fat interface forces Robot to implement eat()
+class Worker(ABC):
+    @abstractmethod
+    def work(self): ...
+    @abstractmethod
+    def eat(self): ...
+
+# AFTER: split into focused roles (Protocols)
+from typing import Protocol
+class Workable(Protocol):
+    def work(self) -> None: ...
+class Eatable(Protocol):
+    def eat(self) -> None: ...
+class Robot:                         # implements only work
+    def work(self): ...`,
+ mapsLabel:"Uses",maps:["Protocols","Adapter"],
+ cx:["many small roles > one <b>fat interface</b>"]},
+
+{track:"2 · The Five (SOLID)",tier:"core",term:"D \u2014 Dependency Inversion",
+ def:"High-level modules shouldn\u2019t depend on low-level ones \u2014 <strong>both depend on abstractions</strong>. Depend on an interface; inject the concrete implementation.",
+ tlabel:"You\u2019re violating it when",
+ trigger:"A high-level class constructs a concrete dependency inside itself (<code>self.db = MySQLDatabase()</code>). That hard-couples them and makes the class untestable without the real thing.",
+ code:`# BEFORE: hard-wired to a concrete database
+class ReportService:
+    def __init__(self):
+        self.db = MySQLDatabase()    # tight coupling
+
+# AFTER: depend on an abstraction, inject the concrete
+from typing import Protocol
+class Database(Protocol):
+    def query(self, sql: str) -> list: ...
+class ReportService:
+    def __init__(self, db: Database):   # injected
+        self.db = db
+# tests pass an in-memory fake, zero edits`,
+ mapsLabel:"Realized by",maps:["Dependency Injection","Factory"],
+ cx:["both sides depend on the <b>abstraction</b>"]},
+
+/* ===== 3 · PYTHON MECHANICS ===== */
+{track:"3 · Python Mechanics",tier:"common",term:"Abstract Base Classes",
+ def:"<code>abc.ABC</code> + <code>@abstractmethod</code> define a contract subclasses <strong>must</strong> implement; the abstract class can\u2019t be instantiated. Nominal typing \u2014 you must inherit.",
+ tlabel:"Reach for it when",
+ trigger:"You want to guarantee an implementation at class-definition time and share an explicit \u201cis-a\u201d contract across a known set of subclasses you own.",
+ code:`from abc import ABC, abstractmethod
+class PaymentGateway(ABC):
+    @abstractmethod
+    def charge(self, amount: int) -> bool: ...
+
+class Stripe(PaymentGateway):
+    def charge(self, amount): return True
+
+PaymentGateway()      # TypeError: can't instantiate
+# forgetting charge() -> TypeError at instantiation`,
+ mapsLabel:"Serves",maps:["OCP","LSP","DIP"],
+ cx:["<b>nominal</b> typing \u2014 must subclass"]},
+
+{track:"3 · Python Mechanics",tier:"common",term:"Protocols (structural typing)",
+ def:"<code>typing.Protocol</code> \u2014 a class satisfies it just by <strong>having the right methods</strong>, no inheritance needed. The Pythonic way to express an interface.",
+ tlabel:"Reach for it when",
+ trigger:"You want ISP/DIP without forcing a class hierarchy, or you\u2019re typing a dependency you don\u2019t own. Duck typing, but checkable by the type checker.",
+ code:`from typing import Protocol, runtime_checkable
+@runtime_checkable
+class Reader(Protocol):
+    def read(self) -> str: ...
+
+class FileSource:            # no inheritance!
+    def read(self): return "data"
+
+def load(src: Reader): return src.read()
+load(FileSource())           # conforms structurally`,
+ mapsLabel:"Serves",maps:["ISP","DIP"],
+ cx:["<b>structural</b> typing \u2014 no inheritance"]},
+
+{track:"3 · Python Mechanics",tier:"core",term:"Dependency Injection",
+ def:"Pass a collaborator in (via the constructor or a parameter) instead of building it inside. The mechanism that makes DIP real \u2014 and makes code testable.",
+ tlabel:"Reach for it when",
+ trigger:"A class hard-codes <code>self.x = Concrete()</code>, so you can\u2019t test it or swap the implementation without editing or monkey-patching.",
+ code:`# inject the dependency instead of constructing it
+class Service:
+    def __init__(self, repo: Repo):    # injected
+        self.repo = repo
+
+Service(PostgresRepo())    # production
+Service(FakeRepo())        # test: no DB, no patching`,
+ mapsLabel:"Serves",maps:["DIP","OCP"],
+ cx:["enables <b>swapping</b> + <b>testing</b>"]},
+
+{track:"3 · Python Mechanics",tier:"common",term:"Composition over Inheritance",
+ def:"Build behavior by <strong>combining objects (\u201chas-a\u201d)</strong> instead of deep subclassing (\u201cis-a\u201d). More flexible, and it sidesteps fragile hierarchies.",
+ tlabel:"Reach for it when",
+ trigger:"An inheritance tree is getting deep, or you\u2019re subclassing just to reuse code rather than to model a true \u201cis-a\u201d relationship. Delegate instead.",
+ code:`# 'has-a' via delegation, not 'is-a' via inheritance
+class Engine:
+    def start(self): ...
+
+class Car:
+    def __init__(self):
+        self.engine = Engine()     # has-a
+    def start(self):
+        self.engine.start()        # delegate`,
+ mapsLabel:"Serves",maps:["LSP","OCP","SRP"],
+ cx:["a flexible \u201chas-a\u201d beats a brittle \u201cis-a\u201d"]},
+
+/* ===== 4 · COMPANION PRINCIPLES ===== */
+{track:"4 · Companion Principles",tier:"common",term:"DRY",
+ def:"<strong>Don\u2019t Repeat Yourself.</strong> Every piece of knowledge has one authoritative source. Duplicated logic drifts out of sync and multiplies bugs.",
+ tlabel:"Apply it when you see",
+ trigger:"The same rule copy-pasted in several places. But beware over-DRYing: don\u2019t merge code that only <em>looks</em> alike but changes for different reasons \u2014 that couples them.",
+ code:`# BEFORE: the same tax rule, duplicated
+def price_us(x): return x * 1.07
+def price_ca(x): return x * 1.07
+
+# AFTER: one source of truth
+TAX = 1.07
+def price(x): return x * TAX`,
+ mapsLabel:"Related",maps:["SRP"],
+ cx:["one source of truth","don\u2019t DRY <b>coincidental</b> dupes"]},
+
+{track:"4 · Companion Principles",tier:"sit",term:"KISS",
+ def:"<strong>Keep It Simple.</strong> Prefer the simplest design that solves the problem. Complexity is a cost you pay on every future read.",
+ tlabel:"Apply it when you see",
+ trigger:"A metaclass, factory, or abstraction layer where a plain function would do. Reviewers read simplicity as competence, not the reverse.",
+ code:`# over-engineered
+class GreeterFactoryProvider: ...
+
+# simple, and correct
+def greet(name): return f"Hi {name}"`,
+ mapsLabel:"Related",maps:["YAGNI"],
+ cx:["clever is a <b>liability</b>, not a flex"]},
+
+{track:"4 · Companion Principles",tier:"sit",term:"YAGNI",
+ def:"<strong>You Aren\u2019t Gonna Need It.</strong> Don\u2019t build for hypothetical future requirements \u2014 add capability when it\u2019s actually needed.",
+ tlabel:"Apply it when you see",
+ trigger:"Config flags, plugin systems, or abstraction layers with exactly one implementation, added \u201cfor later.\u201d Add the seam when the second real case arrives.",
+ code:`# YAGNI: one backend today? Don't build a plugin
+# framework for the five you *might* add someday.
+# Introduce the abstraction when backend #2 is real.`,
+ mapsLabel:"Related",maps:["KISS"],
+ cx:["build for <b>today\u2019s</b> requirement"]},
+
+{track:"4 · Companion Principles",tier:"sit",term:"Law of Demeter",
+ def:"\u201cTell, don\u2019t ask.\u201d Talk only to your <strong>immediate collaborators</strong>; don\u2019t reach through them. <code>a.b.c.d()</code> couples you to the whole chain.",
+ tlabel:"Apply it when you see",
+ trigger:"Train-wreck chains like <code>order.customer.address.city</code>. Ask the direct neighbor to expose what you need instead of digging through it.",
+ code:`# BEFORE: reaching through objects
+city = order.customer.address.city
+
+# AFTER: tell, don't ask
+city = order.shipping_city()   # order exposes the need`,
+ mapsLabel:"Related",maps:["SRP","Encapsulation"],
+ cx:["one dot fine, <b>many dots</b> suspicious"]},
+
+/* ===== 5 · PATTERNS IT UNLOCKS ===== */
+{track:"5 · Patterns It Unlocks",tier:"common",term:"Strategy",
+ def:"Encapsulate interchangeable algorithms behind a common interface and pick one at runtime. The canonical realization of Open/Closed.",
+ tlabel:"Reach for it when",
+ trigger:"A growing family of <code>if/elif</code> variations of \u201chow to do X\u201d \u2014 sort, pay, compress, price \u2014 that keeps needing new branches.",
+ code:`class PayPal:
+    def pay(self, amt): ...
+class Crypto:
+    def pay(self, amt): ...
+
+class Checkout:
+    def __init__(self, method):    # inject a strategy
+        self.method = method
+    def process(self, amt):
+        self.method.pay(amt)
+Checkout(PayPal()).process(50)`,
+ mapsLabel:"Serves",maps:["OCP","DIP"],
+ cx:["swap behavior, <b>no if/elif</b>"]},
+
+{track:"5 · Patterns It Unlocks",tier:"common",term:"Factory",
+ def:"Centralize object creation behind a function/method so callers depend on an <strong>abstraction</strong>, not concrete constructors.",
+ tlabel:"Reach for it when",
+ trigger:"Concrete classes are being constructed all over the codebase, so adding a new type means hunting down and editing many call sites.",
+ code:`def make_gateway(kind: str) -> PaymentGateway:
+    return {
+        "stripe": Stripe,
+        "paypal": PayPal,
+    }[kind]()
+
+gw = make_gateway("stripe")   # caller knows only the ABC`,
+ mapsLabel:"Serves",maps:["DIP","OCP"],
+ cx:["isolate the <b>new</b> keyword in one place"]},
+
+{track:"5 · Patterns It Unlocks",tier:"sit",term:"Decorator",
+ def:"Wrap an object/function to <strong>add behavior without touching its code</strong>. Extension by composition \u2014 and Python has first-class syntax for it.",
+ tlabel:"Reach for it when",
+ trigger:"You want to add logging, caching, timing, or auth to something without modifying it or exploding the number of subclasses.",
+ code:`def timed(fn):
+    def wrapper(*a, **k):
+        import time; t = time.perf_counter()
+        r = fn(*a, **k)
+        print(time.perf_counter() - t)
+        return r
+    return wrapper
+
+@timed
+def work(): ...`,
+ mapsLabel:"Serves",maps:["OCP","SRP"],
+ cx:["add behavior by <b>wrapping</b>"]},
+
+{track:"5 · Patterns It Unlocks",tier:"sit",term:"Observer",
+ def:"A subject notifies subscribers of events <strong>without knowing who they are</strong>. Decouples the producer of a change from everything that reacts to it.",
+ tlabel:"Reach for it when",
+ trigger:"One state change must trigger many reactions, and you don\u2019t want the source hard-wired to each handler (events, pub/sub, UI updates).",
+ code:`class Subject:
+    def __init__(self): self._subs = []
+    def subscribe(self, fn): self._subs.append(fn)
+    def emit(self, event):
+        for fn in self._subs:       # source doesn't know them
+            fn(event)
+
+s = Subject()
+s.subscribe(print)
+s.emit("saved")`,
+ mapsLabel:"Serves",maps:["OCP","SRP"],
+ cx:["decouple the <b>event</b> from the <b>reaction</b>"]},
+];
+
+/* ---- syntax highlighter ---- */
+const KW = new Set(["def","class","return","if","elif","else","while","for","in","not","and","or","is","None","True","False","import","from","self","del","pass","break","continue","lambda","yield","with","as","try","except","finally","raise","global","nonlocal"]);
+const FN = new Set(["print","len","range","set","dict","list","tuple","sum","max","min","append","pop","popleft","add","discard","get","index","setdefault","deque","heapq","join","upper","lower","sorted","enumerate","perf_counter","Protocol","ABC","abstractmethod","runtime_checkable"]);
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function highlight(code){
+  return code.replace(/(#.*)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|([A-Za-z_]\w*)|(\d+)|([\s\S])/g,
+    (m,com,str,word,num,other)=>{
+      if(com!==undefined)  return '<span class="c-com">'+esc(com)+'</span>';
+      if(str!==undefined)  return '<span class="c-str">'+esc(str)+'</span>';
+      if(word!==undefined){
+        if(KW.has(word)) return '<span class="c-kw">'+word+'</span>';
+        if(FN.has(word)) return '<span class="c-fn">'+word+'</span>';
+        return esc(word);
+      }
+      if(num!==undefined)  return '<span class="c-num">'+num+'</span>';
+      return esc(other);
+    });
+}
+
+/* ---- app ---- */
+const TRACKS = ["All", ...Array.from(new Set(CARDS.map(c=>c.track)))];
+let filter="All", deck=CARDS.slice(), idx=0;
+const $=id=>document.getElementById(id);
+const TIER_LABEL={core:"Core",common:"Common",sit:"Situational"};
+
+function buildFilters(){
+  const box=$("filters"); box.innerHTML="";
+  TRACKS.forEach(t=>{
+    const b=document.createElement("button");
+    b.className="chip"+(t===filter?" active":"");
+    b.textContent=t;
+    b.onclick=()=>{filter=t;applyFilter();};
+    box.appendChild(b);
+  });
+}
+function applyFilter(){
+  deck = filter==="All" ? CARDS.slice() : CARDS.filter(c=>c.track===filter);
+  idx=0; buildFilters(); render();
+}
+function render(){
+  const c=deck[idx];
+  $("card").classList.remove("flipped");
+  $("f-track").textContent=c.track;
+  $("b-track").textContent=c.track;
+  ["f","b"].forEach(p=>{
+    const el=$(p+"-tier");
+    el.textContent=TIER_LABEL[c.tier];
+    el.className="tier "+c.tier;
+  });
+  $("f-term").textContent=c.term;
+  $("b-term").textContent=c.term;
+  $("b-def").innerHTML=c.def;
+  $("b-tlabel").textContent="\u25B8 "+c.tlabel;
+  $("b-trigger").innerHTML=c.trigger;
+  $("b-code").innerHTML=highlight(c.code);
+  const pw=$("b-prob-wrap");
+  if(c.maps && c.maps.length){
+    pw.style.display="";
+    $("b-mapslabel").textContent=c.mapsLabel||"Related";
+    $("b-prob").innerHTML=c.maps.map(p=>'<span class="pill">'+p+'</span>').join("");
+  } else { pw.style.display="none"; }
+  $("b-cx").innerHTML=c.cx.map(x=>"<span>"+x+"</span>").join("");
+  $("pos").textContent=idx+1;
+  $("total").textContent=deck.length;
+  $("deckname").textContent=filter;
+  const bs=document.querySelector(".backscroll"); if(bs) bs.scrollTop=0;
+}
+function flip(e){if(e)e.stopPropagation();$("card").classList.toggle("flipped");}
+function next(e){if(e)e.stopPropagation();idx=(idx+1)%deck.length;render();}
+function prev(e){if(e)e.stopPropagation();idx=(idx-1+deck.length)%deck.length;render();}
+function shuffle(e){if(e)e.stopPropagation();for(let i=deck.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[deck[i],deck[j]]=[deck[j],deck[i]];}idx=0;render();}
+function coreOnly(e){if(e)e.stopPropagation();filter="All";deck=CARDS.filter(c=>c.tier==="core");idx=0;buildFilters();$("deckname").textContent="Core";render();}
+function reset(e){if(e)e.stopPropagation();filter="All";applyFilter();}
+document.addEventListener("keydown",ev=>{
+  if(ev.key==="ArrowRight")next();
+  else if(ev.key==="ArrowLeft")prev();
+  else if(ev.key===" "){ev.preventDefault();flip();}
+  else if(ev.key.toLowerCase()==="s")shuffle();
+  else if(ev.key.toLowerCase()==="c")coreOnly();
+});
+buildFilters();render();
+</script>
+</body>
+</html>
